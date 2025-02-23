@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="ja">
+<!DOCTYPE html>
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,11 +23,15 @@
             background: #fff;
         }
         .arrow {
-            font-size: 30px;
             position: absolute;
-            top: 310px;
+            top: -10px;
             left: 50%;
             transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 30px solid red;
         }
         button {
             margin-top: 5px;
@@ -75,103 +80,109 @@
         }
     </style>
 </head>
-<body><h1>カスタムルーレット</h1>
-
-<input type="text" id="optionInput" placeholder="選択肢を入力">
-<button onclick="addOption()">追加</button>
-<button onclick="resetOptions()">リセット</button>
-
-<ul id="optionList"></ul>
-
-<div class="container">
-    <canvas id="wheelCanvas" width="300" height="300"></canvas>
-    <div class="arrow">⬆️</div>
-</div>
-
-<br>
-<button onclick="spinWheel()">回す！</button>
-
-<script>
-    const canvas = document.getElementById("wheelCanvas");
-    const ctx = canvas.getContext("2d");
-
-    let options = JSON.parse(localStorage.getItem("rouletteOptions")) || [];
-    const colors = ["#FF9999", "#FFDD99", "#99FF99", "#99DDFF", "#DD99FF", "#FFFF99", "#99FFFF"];
-    let angle = 0;
-    let spinning = false;
-
-    function saveOptions() {
-        localStorage.setItem("rouletteOptions", JSON.stringify(options));
-    }
-
-    function addOption() {
-        const input = document.getElementById("optionInput");
-        const value = input.value.trim();
-        if (value) {
-            options.push(value);
+<body>
+    <h1>カスタムルーレット</h1>
+    <input type="text" id="optionInput" placeholder="選択肢を入力">
+    <button onclick="addOption()">追加</button>
+    <button onclick="resetOptions()">リセット</button>
+    <ul id="optionList"></ul>
+    <div class="container">
+        <div class="arrow"></div>
+        <canvas id="wheelCanvas" width="300" height="300"></canvas>
+    </div>
+    <br>
+    <button onclick="spinWheel()">回す！</button>
+    <script>
+        const canvas = document.getElementById("wheelCanvas");
+        const ctx = canvas.getContext("2d");
+        let options = [];
+        const colors = ["#FF9999", "#FFDD99", "#99FF99", "#99DDFF", "#DD99FF", "#FFFF99", "#99FFFF"];
+        let angle = 0;
+        let spinning = false;
+        function addOption() {
+            const input = document.getElementById("optionInput");
+            const value = input.value.trim();
+            if (value) {
+                options.push(value);
+                updateOptionList();
+                input.value = "";
+                drawWheel();
+            }
+        }
+        function removeOption(index) {
+            options.splice(index, 1);
             updateOptionList();
-            input.value = "";
             drawWheel();
-            saveOptions();
         }
-    }
-
-    function removeOption(index) {
-        options.splice(index, 1);
-        updateOptionList();
-        drawWheel();
-        saveOptions();
-    }
-
-    function resetOptions() {
-        options = [];
-        updateOptionList();
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        saveOptions();
-    }
-
-    function updateOptionList() {
-        const list = document.getElementById("optionList");
-        list.innerHTML = "";
-        options.forEach((opt, index) => {
-            const li = document.createElement("li");
-            li.textContent = opt;
-            const deleteBtn = document.createElement("button");
-            deleteBtn.textContent = "×";
-            deleteBtn.className = "delete-btn";
-            deleteBtn.onclick = () => removeOption(index);
-            li.appendChild(deleteBtn);
-            list.appendChild(li);
-        });
-    }
-
-    function drawWheel() {
-        if (options.length === 0) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const sliceAngle = (2 * Math.PI) / options.length;
-        for (let i = 0; i < options.length; i++) {
-            ctx.beginPath();
-            ctx.moveTo(150, 150);
-            ctx.arc(150, 150, 150, sliceAngle * i + angle, sliceAngle * (i + 1) + angle);
-            ctx.closePath();
-            ctx.fillStyle = colors[i % colors.length];
-            ctx.fill();
-            ctx.stroke();
-
-            ctx.fillStyle = "#000";
-            ctx.font = "14px Arial";
-            ctx.textAlign = "center";
-            ctx.save();
-            ctx.translate(150, 150);
-            ctx.rotate(sliceAngle * i + sliceAngle / 2 + angle);
-            ctx.fillText(options[i], 100, 10);
-            ctx.restore();
+        function resetOptions() {
+            options = [];
+            updateOptionList();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
-    }
-
-    drawWheel();
-    updateOptionList();
-</script>
-
+        function updateOptionList() {
+            const list = document.getElementById("optionList");
+            list.innerHTML = "";
+            options.forEach((opt, index) => {
+                const li = document.createElement("li");
+                li.textContent = opt;
+                const deleteBtn = document.createElement("button");
+                deleteBtn.textContent = "×";
+                deleteBtn.className = "delete-btn";
+                deleteBtn.onclick = () => removeOption(index);
+                li.appendChild(deleteBtn);
+                list.appendChild(li);
+            });
+        }
+        function drawWheel() {
+            if (options.length === 0) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const sliceAngle = (2 * Math.PI) / options.length;
+            for (let i = 0; i < options.length; i++) {
+                ctx.beginPath();
+                ctx.moveTo(150, 150);
+                ctx.arc(150, 150, 150, sliceAngle * i + angle, sliceAngle * (i + 1) + angle);
+                ctx.closePath();
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.fill();
+                ctx.stroke();
+                ctx.fillStyle = "#000";
+                ctx.font = "14px Arial";
+                ctx.textAlign = "center";
+                ctx.save();
+                ctx.translate(150, 150);
+                ctx.rotate(sliceAngle * i + sliceAngle / 2 + angle);
+                ctx.fillText(options[i], 100, 10);
+                ctx.restore();
+            }
+        }
+        function spinWheel() {
+            if (spinning || options.length === 0) return;
+            spinning = true;
+            let spinAngle = Math.random() * 360 + 1800;
+            let spinTime = 3000;
+            let startTime = null;
+            function animate(time) {
+                if (!startTime) startTime = time;
+                let progress = (time - startTime) / spinTime;
+                if (progress < 1) {
+                    angle = (spinAngle * (1 - Math.pow(1 - progress, 3))) * Math.PI / 180;
+                    drawWheel();
+                    requestAnimationFrame(animate);
+                } else {
+                    spinning = false;
+                    let winningIndex = Math.floor(((angle % (2 * Math.PI)) / (2 * Math.PI)) * options.length);
+                    let result = options[(options.length - winningIndex) % options.length];
+                    alert("結果: " + result);
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+    </script>
 </body>
 </html>
+
+リアクションする
+
+返信
+
+
