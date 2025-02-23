@@ -22,19 +22,8 @@
             margin-top: 20px;
             background: #fff;
         }
-        .arrow {
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-bottom: 30px solid red;
-        }
         button {
-            margin-top: 5px;
+            margin-top: 10px;
             padding: 10px 15px;
             font-size: 16px;
             cursor: pointer;
@@ -56,6 +45,7 @@
         ul {
             list-style: none;
             padding: 0;
+            margin-top: 10px;
         }
         li {
             background: #fff;
@@ -78,40 +68,75 @@
         .delete-btn:hover {
             background: #ff3333;
         }
-        .note {
+        .result {
+            font-size: 24px;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #ff66a3;
+        }
+        .info {
+            margin-top: 20px;
             font-size: 14px;
-            color: #333;
-            margin-top: 15px;
+            color: #555;
+            background-color: #ffccff;
+            padding: 10px;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
     <h1>ルーレット</h1>
-    <input type="text" id="optionInput" placeholder="選択肢を入力">
-    <button onclick="addOption()">追加</button>
-    <button onclick="resetOptions()">リセット</button>
+
+    <!-- 入力欄 -->
+    <input type="text" id="optionInput" placeholder="選択肢を入力" onkeydown="handleInputKey(event)">
+    
+    <!-- 追加 と リセット ボタン -->
+    <div>
+        <button onclick="addOption()">追加</button>
+        <button onclick="resetOptions()">リセット</button>
+    </div>
+    
+    <!-- 追加された選択肢を表示するリスト -->
     <ul id="optionList"></ul>
+
+    <!-- ルーレットの表示 -->
     <div class="container">
-        <div class="arrow"></div>
         <canvas id="wheelCanvas" width="300" height="300"></canvas>
     </div>
-    <br>
-    <button onclick="spinWheel()">回す↗</button>
-    <p class="note">エンターで操作できます。</p>
+
+    <!-- 回すボタン -->
+    <button onclick="spinWheel()">回す！</button>
+
+    <!-- 結果表示 -->
+    <div class="result" id="resultDisplay"></div>
+
+    <!-- 操作の説明 -->
+    <div class="info">
+        <p>エンターキーの使い方:</p>
+        <ul>
+            <li>選択肢の入力後、エンターで「追加」</li>
+            <li>選択肢が入力されていない状態でエンターを押すと「回す！」が実行されます</li>
+        </ul>
+    </div>
 
     <script>
         const canvas = document.getElementById("wheelCanvas");
         const ctx = canvas.getContext("2d");
-        let options = [];
+        let options = JSON.parse(localStorage.getItem("options")) || [];  // ローカルストレージからデータを取得
         const colors = ["#FF9999", "#FFDD99", "#99FF99", "#99DDFF", "#DD99FF", "#FFFF99", "#99FFFF"];
         let angle = 0;
         let spinning = false;
+        let resultIndex = -1; // 結果のインデックスを保持
+
+        // ページが読み込まれた時に、選択肢リストを更新
+        window.onload = updateOptionList;
 
         function addOption() {
             const input = document.getElementById("optionInput");
             const value = input.value.trim();
             if (value) {
                 options.push(value);
+                localStorage.setItem("options", JSON.stringify(options));  // ローカルストレージに保存
                 updateOptionList();
                 input.value = "";
                 drawWheel();
@@ -120,14 +145,18 @@
 
         function removeOption(index) {
             options.splice(index, 1);
+            localStorage.setItem("options", JSON.stringify(options));  // ローカルストレージに保存
             updateOptionList();
             drawWheel();
         }
 
         function resetOptions() {
             options = [];
+            localStorage.removeItem("options");  // ローカルストレージから削除
             updateOptionList();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            resultIndex = -1; // 結果インデックスをリセット
+            document.getElementById("resultDisplay").textContent = ''; // 結果表示エリアをリセット
         }
 
         function updateOptionList() {
@@ -157,6 +186,7 @@
                 ctx.fillStyle = colors[i % colors.length];
                 ctx.fill();
                 ctx.stroke();
+
                 ctx.fillStyle = "#000";
                 ctx.font = "14px Arial";
                 ctx.textAlign = "center";
@@ -174,6 +204,7 @@
             let spinAngle = Math.random() * 360 + 1800;
             let spinTime = 3000;
             let startTime = null;
+
             function animate(time) {
                 if (!startTime) startTime = time;
                 let progress = (time - startTime) / spinTime;
@@ -183,26 +214,26 @@
                     requestAnimationFrame(animate);
                 } else {
                     spinning = false;
-                    let winningIndex = Math.floor(((angle % (2 * Math.PI)) / (2 * Math.PI)) * options.length);
-                    let result = options[(options.length - winningIndex) % options.length];
-                    alert("結果: " + result);
+                    resultIndex = Math.floor(((angle % (2 * Math.PI)) / (2 * Math.PI)) * options.length);
+                    let result = options[(options.length - resultIndex) % options.length];
+                    document.getElementById("resultDisplay").textContent = "結果: " + result; // 結果を画面に表示
                 }
             }
+
             requestAnimationFrame(animate);
         }
 
-        // エンターキーで操作
-        document.getElementById('optionInput').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                addOption();
+        // エンターキーで追加または回す操作を実行
+        function handleInputKey(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Enterキーによるフォーム送信を防止
+                if (event.target.value.trim() !== "") {
+                    addOption();
+                } else {
+                    spinWheel();
+                }
             }
-        });
-
-        document.querySelector('button').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                spinWheel();
-            }
-        });
+        }
     </script>
 </body>
 </html>
