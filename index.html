@@ -80,7 +80,7 @@
     <h1>ルーレット</h1>
 
     <!-- 入力欄 -->
-    <input type="text" id="optionInput" placeholder="選択肢を入力">
+    <input type="text" id="optionInput" placeholder="選択肢を入力" onkeydown="handleInputKey(event)">
     
     <!-- 追加 と リセット ボタン -->
     <div>
@@ -164,14 +164,6 @@
                 ctx.fill();
                 ctx.stroke();
 
-                // 結果のスライスを強調するために色を変更
-                if (i === resultIndex) {
-                    ctx.fillStyle = "#ff66a3"; // 結果のスライスの色
-                } else {
-                    ctx.fillStyle = colors[i % colors.length]; // 通常の色
-                }
-
-                ctx.fill();
                 ctx.fillStyle = "#000";
                 ctx.font = "14px Arial";
                 ctx.textAlign = "center";
@@ -206,6 +198,18 @@
             }
 
             requestAnimationFrame(animate);
+        }
+
+        // エンターキーで追加または回す操作を実行
+        function handleInputKey(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Enterキーによるフォーム送信を防止
+                if (event.target.value.trim() !== "") {
+                    addOption();
+                } else {
+                    spinWheel();
+                }
+            }
         }
     </script>
 </body>
