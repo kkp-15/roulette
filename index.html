@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カスタムルーレット</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        canvas {
+            border: 2px solid #ddd;
+            margin-top: 20px;
+        }
+        button {
+            margin-top: 5px;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        input {
+            padding: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>カスタムルーレット</h1>
+    
+    <input type="text" id="optionInput" placeholder="選択肢を入力">
+    <button onclick="addOption()">追加</button>
+    <button onclick="resetOptions()">リセット</button>
+    
+    <ul id="optionList"></ul>
+
+    <canvas id="wheelCanvas" width="300" height="300"></canvas>
+    <br>
+    <button onclick="spinWheel()">回す！</button>
+
+    <script>
+        const canvas = document.getElementById("wheelCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let options = [];
+        const colors = ["#FF9999", "#FFDD99", "#99FF99", "#99DDFF", "#DD99FF", "#FFFF99", "#99FFFF"];
+        let angle = 0;
+        let spinning = false;
+
+        function addOption() {
+            const input = document.getElementById("optionInput");
+            const value = input.value.trim();
+            if (value) {
+                options.push(value);
+                updateOptionList();
+                input.value = "";
+                drawWheel();
+            }
+        }
+
+        function resetOptions() {
+            options = [];
+            updateOptionList();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function updateOptionList() {
+            const list = document.getElementById("optionList");
+            list.innerHTML = "";
+            options.forEach((opt, index) => {
+                const li = document.createElement("li");
+                li.textContent = opt;
+                list.appendChild(li);
+            });
+        }
+
+        function drawWheel() {
+            if (options.length === 0) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const sliceAngle = (2 * Math.PI) / options.length;
+            for (let i = 0; i < options.length; i++) {
+                ctx.beginPath();
+                ctx.moveTo(150, 150);
+                ctx.arc(150, 150, 150, sliceAngle * i + angle, sliceAngle * (i + 1) + angle);
+                ctx.closePath();
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = "#000";
+                ctx.font = "14px Arial";
+                ctx.textAlign = "center";
+                ctx.save();
+                ctx.translate(150, 150);
+                ctx.rotate(sliceAngle * i + sliceAngle / 2 + angle);
+                ctx.fillText(options[i], 100, 10);
+                ctx.restore();
+            }
+        }
+
+        function spinWheel() {
+            if (spinning || options.length === 0) return;
+            spinning = true;
+            let spinAngle = Math.random() * 360 + 1800;
+            let spinTime = 3000;
+            let startTime = null;
+
+            function animate(time) {
+                if (!startTime) startTime = time;
+                let progress = (time - startTime) / spinTime;
+                if (progress < 1) {
+                    angle = (spinAngle * (1 - Math.pow(1 - progress, 3))) * Math.PI / 180;
+                    drawWheel();
+                    requestAnimationFrame(animate);
+                } else {
+                    spinning = false;
+                    let winningIndex = Math.floor(((angle % (2 * Math.PI)) / (2 * Math.PI)) * options.length);
+                    alert("結果: " + options[(options.length - winningIndex) % options.length]);
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+    </script>
+
+</body>
+</html>
+
