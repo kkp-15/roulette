@@ -74,6 +74,14 @@
             font-weight: bold;
             color: #ff66a3;
         }
+        .info {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+            background-color: #ffccff;
+            padding: 10px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -101,6 +109,15 @@
 
     <!-- 結果表示 -->
     <div class="result" id="resultDisplay"></div>
+
+    <!-- 操作の説明 -->
+    <div class="info">
+        <p>エンターキーの使い方:</p>
+        <ul>
+            <li>選択肢の入力後、エンターで「追加」</li>
+            <li>選択肢が入力されていない状態でエンターを押すと「回す！」が実行されます</li>
+        </ul>
+    </div>
 
     <script>
         const canvas = document.getElementById("wheelCanvas");
