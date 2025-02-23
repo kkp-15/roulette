@@ -87,7 +87,7 @@
         const colors = ["#FF9999", "#FFDD99", "#99FF99", "#99DDFF", "#DD99FF", "#FFFF99", "#99FFFF"];
         let angle = 0;
         let spinning = false;
-        let winningIndex = null;  // 結果のインデックスを保存
+        let resultIndex = -1; // 結果のインデックスを保持
 
         function addOption() {
             const input = document.getElementById("optionInput");
@@ -110,6 +110,7 @@
             options = [];
             updateOptionList();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            resultIndex = -1; // 結果インデックスをリセット
         }
 
         function updateOptionList() {
@@ -139,17 +140,22 @@
                 ctx.fillStyle = colors[i % colors.length];
                 ctx.fill();
                 ctx.stroke();
+
+                // 結果のスライスの輪郭を太くする
+                if (i === resultIndex) {
+                    ctx.lineWidth = 5; // 輪郭を太くする
+                    ctx.strokeStyle = "#000"; // 輪郭色
+                } else {
+                    ctx.lineWidth = 1; // 通常の輪郭
+                    ctx.strokeStyle = "#fff"; // 通常の輪郭色
+                }
+
                 ctx.fillStyle = "#000";
                 ctx.font = "14px Arial";
                 ctx.textAlign = "center";
                 ctx.save();
                 ctx.translate(150, 150);
                 ctx.rotate(sliceAngle * i + sliceAngle / 2 + angle);
-                // 強調したいオプションを塗りつぶし
-                if (i === winningIndex) {
-                    ctx.fillStyle = "#FF0000";  // 強調色（赤）
-                    ctx.font = "16px Arial";
-                }
                 ctx.fillText(options[i], 100, 10);
                 ctx.restore();
             }
@@ -171,12 +177,12 @@
                     requestAnimationFrame(animate);
                 } else {
                     spinning = false;
-                    winningIndex = Math.floor(((angle % (2 * Math.PI)) / (2 * Math.PI)) * options.length);
-                    let result = options[(options.length - winningIndex) % options.length];
+                    resultIndex = Math.floor(((angle % (2 * Math.PI)) / (2 * Math.PI)) * options.length);
+                    let result = options[(options.length - resultIndex) % options.length];
                     alert("結果: " + result);
-                    drawWheel();  // 結果を強調した後に再描画
                 }
             }
+
             requestAnimationFrame(animate);
         }
     </script>
