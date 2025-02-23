@@ -122,17 +122,21 @@
     <script>
         const canvas = document.getElementById("wheelCanvas");
         const ctx = canvas.getContext("2d");
-        let options = [];
+        let options = JSON.parse(localStorage.getItem("options")) || [];  // ローカルストレージからデータを取得
         const colors = ["#FF9999", "#FFDD99", "#99FF99", "#99DDFF", "#DD99FF", "#FFFF99", "#99FFFF"];
         let angle = 0;
         let spinning = false;
         let resultIndex = -1; // 結果のインデックスを保持
+
+        // ページが読み込まれた時に、選択肢リストを更新
+        window.onload = updateOptionList;
 
         function addOption() {
             const input = document.getElementById("optionInput");
             const value = input.value.trim();
             if (value) {
                 options.push(value);
+                localStorage.setItem("options", JSON.stringify(options));  // ローカルストレージに保存
                 updateOptionList();
                 input.value = "";
                 drawWheel();
@@ -141,12 +145,14 @@
 
         function removeOption(index) {
             options.splice(index, 1);
+            localStorage.setItem("options", JSON.stringify(options));  // ローカルストレージに保存
             updateOptionList();
             drawWheel();
         }
 
         function resetOptions() {
             options = [];
+            localStorage.removeItem("options");  // ローカルストレージから削除
             updateOptionList();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             resultIndex = -1; // 結果インデックスをリセット
