@@ -24,7 +24,7 @@
         .arrow {
             font-size: 30px;
             position: absolute;
-            top: 320px;
+            top: 310px;
             left: 50%;
             transform: translateX(-50%);
         }
@@ -95,10 +95,14 @@
     const canvas = document.getElementById("wheelCanvas");
     const ctx = canvas.getContext("2d");
 
-    let options = [];
+    let options = JSON.parse(localStorage.getItem("rouletteOptions")) || [];
     const colors = ["#FF9999", "#FFDD99", "#99FF99", "#99DDFF", "#DD99FF", "#FFFF99", "#99FFFF"];
     let angle = 0;
     let spinning = false;
+
+    function saveOptions() {
+        localStorage.setItem("rouletteOptions", JSON.stringify(options));
+    }
 
     function addOption() {
         const input = document.getElementById("optionInput");
@@ -108,6 +112,7 @@
             updateOptionList();
             input.value = "";
             drawWheel();
+            saveOptions();
         }
     }
 
@@ -115,12 +120,14 @@
         options.splice(index, 1);
         updateOptionList();
         drawWheel();
+        saveOptions();
     }
 
     function resetOptions() {
         options = [];
         updateOptionList();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        saveOptions();
     }
 
     function updateOptionList() {
@@ -161,6 +168,9 @@
             ctx.restore();
         }
     }
+
+    drawWheel();
+    updateOptionList();
 </script>
 
 </body>
