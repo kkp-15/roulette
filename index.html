@@ -67,6 +67,12 @@
         .delete-btn:hover {
             background: #ff3333;
         }
+        .result {
+            font-size: 24px;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #ff66a3;
+        }
     </style>
 </head>
 <body>
@@ -80,6 +86,9 @@
     </div>
     <br>
     <button onclick="spinWheel()">回す！</button>
+
+    <div class="result" id="resultDisplay"></div> <!-- 結果表示エリア -->
+
     <script>
         const canvas = document.getElementById("wheelCanvas");
         const ctx = canvas.getContext("2d");
@@ -111,6 +120,7 @@
             updateOptionList();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             resultIndex = -1; // 結果インデックスをリセット
+            document.getElementById("resultDisplay").textContent = ''; // 結果表示エリアをリセット
         }
 
         function updateOptionList() {
@@ -141,15 +151,14 @@
                 ctx.fill();
                 ctx.stroke();
 
-                // 結果のスライスの輪郭を太くする
+                // 結果のスライスを強調するために色を変更
                 if (i === resultIndex) {
-                    ctx.lineWidth = 5; // 輪郭を太くする
-                    ctx.strokeStyle = "#000"; // 輪郭色
+                    ctx.fillStyle = "#ff66a3"; // 結果のスライスの色
                 } else {
-                    ctx.lineWidth = 1; // 通常の輪郭
-                    ctx.strokeStyle = "#fff"; // 通常の輪郭色
+                    ctx.fillStyle = colors[i % colors.length]; // 通常の色
                 }
 
+                ctx.fill();
                 ctx.fillStyle = "#000";
                 ctx.font = "14px Arial";
                 ctx.textAlign = "center";
@@ -179,7 +188,7 @@
                     spinning = false;
                     resultIndex = Math.floor(((angle % (2 * Math.PI)) / (2 * Math.PI)) * options.length);
                     let result = options[(options.length - resultIndex) % options.length];
-                    alert("結果: " + result);
+                    document.getElementById("resultDisplay").textContent = "結果: " + result; // 結果を画面に表示
                 }
             }
 
