@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ゆめみるルーレット</title>
+    <title>カスタムルーレット</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,15 +22,11 @@
             background: #fff;
         }
         .arrow {
+            font-size: 30px;
             position: absolute;
-            bottom: -40px;
+            top: 320px;
             left: 50%;
-            transform: translateX(-50%) rotate(180deg);
-            width: 0;
-            height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 30px solid red;
+            transform: translateX(-50%);
         }
         button {
             margin-top: 5px;
@@ -79,8 +75,9 @@
         }
     </style>
 </head>
-<body>
-    <h1>ゆめみるルーレット</h1><input type="text" id="optionInput" placeholder="選択肢を入力">
+<body><h1>カスタムルーレット</h1>
+
+<input type="text" id="optionInput" placeholder="選択肢を入力">
 <button onclick="addOption()">追加</button>
 <button onclick="resetOptions()">リセット</button>
 
@@ -88,7 +85,7 @@
 
 <div class="container">
     <canvas id="wheelCanvas" width="300" height="300"></canvas>
-    <div class="arrow"></div>
+    <div class="arrow">⬆️</div>
 </div>
 
 <br>
@@ -163,30 +160,6 @@
             ctx.fillText(options[i], 100, 10);
             ctx.restore();
         }
-    }
-
-    function spinWheel() {
-        if (spinning || options.length === 0) return;
-        spinning = true;
-        let spinAngle = Math.random() * 360 + 1800;
-        let spinTime = 3000;
-        let startTime = null;
-
-        function animate(time) {
-            if (!startTime) startTime = time;
-            let progress = (time - startTime) / spinTime;
-            if (progress < 1) {
-                angle = (spinAngle * (1 - Math.pow(1 - progress, 3))) * Math.PI / 180;
-                drawWheel();
-                requestAnimationFrame(animate);
-            } else {
-                spinning = false;
-                let winningIndex = Math.floor(((angle % (2 * Math.PI)) / (2 * Math.PI)) * options.length);
-                let result = options[(options.length - winningIndex) % options.length];
-                alert("結果: " + result);
-            }
-        }
-        requestAnimationFrame(animate);
     }
 </script>
 
