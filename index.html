@@ -83,11 +83,6 @@
             color: #333;
             margin-top: 15px;
         }
-        .instructions {
-            font-size: 16px;
-            color: #333;
-            margin-top: 20px;
-        }
     </style>
 </head>
 <body>
@@ -103,7 +98,6 @@
     <br>
     <button onclick="spinWheel()">回す↗</button>
     <p class="note">エンターで操作できます。</p>
-    <p class="instructions">選択肢を入力して「追加」を押すと、ルーレットにその選択肢が追加されます。❌️を押すと、その選択肢を削除することができます。</p>
 
     <script>
         const canvas = document.getElementById("wheelCanvas");
@@ -143,7 +137,7 @@
                 const li = document.createElement("li");
                 li.textContent = opt;
                 const deleteBtn = document.createElement("button");
-                deleteBtn.textContent = "❌️";
+                deleteBtn.textContent = "×";
                 deleteBtn.className = "delete-btn";
                 deleteBtn.onclick = () => removeOption(index);
                 li.appendChild(deleteBtn);
