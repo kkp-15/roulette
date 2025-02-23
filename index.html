@@ -9,20 +9,60 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
+            background: linear-gradient(135deg, #ffddff, #ddffff); /* かわいいグラデーション */
+            padding: 20px;
         }
         canvas {
-            border: 2px solid #ddd;
+            border: 3px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.8);
             margin-top: 20px;
+            background: #fff;
         }
         button {
             margin-top: 5px;
             padding: 10px 15px;
             font-size: 16px;
             cursor: pointer;
+            border: none;
+            background: #ff99cc;
+            color: white;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #ff66a3;
         }
         input {
             padding: 5px;
             font-size: 14px;
+            border: 2px solid #ff99cc;
+            border-radius: 5px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background: #fff;
+            padding: 5px 10px;
+            margin: 5px;
+            display: inline-block;
+            border-radius: 5px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+        }
+        .delete-btn {
+            background: #ff6666;
+            color: white;
+            border: none;
+            padding: 3px 7px;
+            margin-left: 5px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .delete-btn:hover {
+            background: #ff3333;
         }
     </style>
 </head>
@@ -60,6 +100,12 @@
             }
         }
 
+        function removeOption(index) {
+            options.splice(index, 1);
+            updateOptionList();
+            drawWheel();
+        }
+
         function resetOptions() {
             options = [];
             updateOptionList();
@@ -72,6 +118,11 @@
             options.forEach((opt, index) => {
                 const li = document.createElement("li");
                 li.textContent = opt;
+                const deleteBtn = document.createElement("button");
+                deleteBtn.textContent = "×";
+                deleteBtn.className = "delete-btn";
+                deleteBtn.onclick = () => removeOption(index);
+                li.appendChild(deleteBtn);
                 list.appendChild(li);
             });
         }
